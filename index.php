@@ -94,7 +94,9 @@ Descending (DESC) order based on ‘reviews’ value from file
 i. You can create file using coding or any 3rd party application
 ii. If 3rd party application is used, provide the application Name, URL (if
 applicable) <br>
-
+<?php
+  $all = array();
+?>
     <?php
     $html = file_get_contents("https://books.toscrape.com/catalogue/category/books/science_22/index.html");
     $start = stripos($html, '<ol>');
@@ -102,25 +104,307 @@ applicable) <br>
     $length = $end - $start;
     $sub_html = substr($html, $start, $length);
     libxml_use_internal_errors(true);
-//     $doc = new DOMDocument();
-//     $doc->loadHTML($sub_html);
-//     $xpath = new DOMXPath($doc);
-//     $titles = $xpath->evaluate('//ol[@class="row"]//li//article//h3/a/@href');
-//     foreach ($titles as $key=>$title) {
-//       $endpoint = $title->textContent;
-//       $endpoint = substr($endpoint, 8);
-//       $content = file_get_contents("https://books.toscrape.com/catalogue" . $endpoint);
-//       $content->filter('.row li article div.product_price p.price_color')->each(function ($node) use (&$prices) {
-// $prices[] = $node->text();
-// });
-//       echo $prices;
+    $doc = new DOMDocument();
+    $doc->loadHTML($sub_html);
+    $xpath = new DOMXPath($doc);
+    $titles = $xpath->evaluate('//ol[@class="row"]//li//article//h3/a/@href');
+    $head_titles = $xpath->evaluate('//ol[@class="row"]//li//article//h3/a');
+    $prices = $xpath->evaluate('//ol[@class="row"]//li//article//div[@class="product_price"]//p[@class="price_color"]');
+    foreach ($titles as $key=>$title) {
+      
+      $endpoint = $title->textContent;
+      $endpoint = substr($endpoint, 8);
+      $content = file_get_contents("https://books.toscrape.com/catalogue" . $endpoint);
+      $doc = new DOMDocument();
+      $doc->loadHTML($content);
+      $xpath = new DOMXPath($doc);
+      $str_result = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      $id = substr(str_shuffle($str_result),0,8);
+      $stack = array();
+      array_push($stack, $id);
+      array_push($stack, $head_titles[$key]->textContent.PHP_EOL);
+      array_push($stack, $prices[$key]->textContent.PHP_EOL);
+      array_push($stack, "Science");
+      array_push($stack, "https://books.toscrape.com/catalogue/category/books/science_22/index.html");
+      $one = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating One"])');
+      $two = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Two"])');
+      $three = $xpath->evaluate('boolean(//p[@class="star-rating Three"])');
+      $four = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Four"])');
+      $five = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Five"])');
+      if($one === true){
+        array_push($stack,"one");
+      }
+      elseif($two === true){
+        array_push($stack,"two");
+      }
+      elseif($three === true){
+        array_push($stack,"three");
+      }
+      elseif($four === true){
+        array_push($stack,"four");
+      }
+      elseif($five === true){
+        array_push($stack,"five");
+      }
+      else {
+        array_push($stack,"zero");
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[6]//td[1]') as $row){
+              if(strpos($row->textContent, "In stock") !== false){
+                  array_push($stack, "In stock");
+                  preg_match_all('!\d+!', $row->textContent, $matches);
+                  array_push($stack, $matches[0][0]);
+              } else{
+                  array_push($stack, "Not in stock");
+                  array_push($stack, 0);
+              }
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[1]//td[1]') as $row){
+               array_push($stack,$row->textContent);
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[7]//td[1]') as $row){
+               array_push($stack,$row->textContent);
+      }
+      array_push($stack, "https://books.toscrape.com/catalogue" . $endpoint);
+      array_push($all, $stack);
+      // foreach($stack as $s){
+      //   echo $s . "<br>";
+      // }
     }
+?>
+<?php
+    $html = file_get_contents("https://books.toscrape.com/catalogue/category/books/historical-fiction_4/page-2.html");
+    $start = stripos($html, '<ol>');
+    $end = stripos($html, "</ol>", $offset = $start);
+    $length = $end - $start;
+    $sub_html = substr($html, $start, $length);
+    libxml_use_internal_errors(true);
+    $doc = new DOMDocument();
+    $doc->loadHTML($sub_html);
+    $xpath = new DOMXPath($doc);
+    $titles = $xpath->evaluate('//ol[@class="row"]//li//article//h3/a/@href');
+    $head_titles = $xpath->evaluate('//ol[@class="row"]//li//article//h3/a');
+    $prices = $xpath->evaluate('//ol[@class="row"]//li//article//div[@class="product_price"]//p[@class="price_color"]');
+    foreach ($titles as $key=>$title) {
+      
+      $endpoint = $title->textContent;
+      $endpoint = substr($endpoint, 8);
+      $content = file_get_contents("https://books.toscrape.com/catalogue" . $endpoint);
+      $doc = new DOMDocument();
+      $doc->loadHTML($content);
+      $xpath = new DOMXPath($doc);
+      $str_result = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      $id = substr(str_shuffle($str_result),0,8);
+      $stack = array();
+      array_push($stack, $id);
+      array_push($stack, $head_titles[$key]->textContent.PHP_EOL);
+      array_push($stack, $prices[$key]->textContent.PHP_EOL);
+      array_push($stack, "Historical Fiction");
+      array_push($stack, "https://books.toscrape.com/catalogue/category/books/historical-fiction_4/page-2.html");
+      $one = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating One"])');
+      $two = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Two"])');
+      $three = $xpath->evaluate('boolean(//p[@class="star-rating Three"])');
+      $four = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Four"])');
+      $five = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Five"])');
+      if($one === true){
+        array_push($stack,"one");
+      }
+      elseif($two === true){
+        array_push($stack,"two");
+      }
+      elseif($three === true){
+        array_push($stack,"three");
+      }
+      elseif($four === true){
+        array_push($stack,"four");
+      }
+      elseif($five === true){
+        array_push($stack,"five");
+      }
+      else {
+        array_push($stack,"zero");
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[6]//td[1]') as $row){
+              if(strpos($row->textContent, "In stock") !== false){
+                  array_push($stack, "In stock");
+                  preg_match_all('!\d+!', $row->textContent, $matches);
+                  array_push($stack, $matches[0][0]);
+              } else{
+                  array_push($stack, "Not in stock");
+                  array_push($stack, 0);
+              }
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[1]//td[1]') as $row){
+               array_push($stack,$row->textContent);
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[7]//td[1]') as $row){
+               array_push($stack,$row->textContent);
+      }
+      array_push($stack, "https://books.toscrape.com/catalogue" . $endpoint);
+      array_push($all, $stack);
+      // foreach($stack as $s){
+      //   echo $s . "<br>";
+      // }
+    }
+?>
+<?php
+    $html = file_get_contents("https://books.toscrape.com/catalogue/category/books/historical-fiction_4/index.html");
+    $start = stripos($html, '<ol>');
+    $end = stripos($html, "</ol>", $offset = $start);
+    $length = $end - $start;
+    $sub_html = substr($html, $start, $length);
+    libxml_use_internal_errors(true);
+    $doc = new DOMDocument();
+    $doc->loadHTML($sub_html);
+    $xpath = new DOMXPath($doc);
+    $titles = $xpath->evaluate('//ol[@class="row"]//li//article//h3/a/@href');
+    $head_titles = $xpath->evaluate('//ol[@class="row"]//li//article//h3/a');
+    $prices = $xpath->evaluate('//ol[@class="row"]//li//article//div[@class="product_price"]//p[@class="price_color"]');
+    foreach ($titles as $key=>$title) {
+      
+      $endpoint = $title->textContent;
+      $endpoint = substr($endpoint, 8);
+      $content = file_get_contents("https://books.toscrape.com/catalogue" . $endpoint);
+      $doc = new DOMDocument();
+      $doc->loadHTML($content);
+      $xpath = new DOMXPath($doc);
+      $str_result = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+      $id = substr(str_shuffle($str_result),0,8);
+      $stack = array();
+      array_push($stack, $id);
+      array_push($stack, $head_titles[$key]->textContent.PHP_EOL);
+      array_push($stack, $prices[$key]->textContent);
+      array_push($stack, "Historical Fiction");
+      array_push($stack, "https://books.toscrape.com/catalogue/category/books/historical-fiction_4/index.html");
+      $one = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating One"])');
+      $two = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Two"])');
+      $three = $xpath->evaluate('boolean(//p[@class="star-rating Three"])');
+      $four = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Four"])');
+      $five = $xpath->evaluate('boolean(//div[@class="col-sm-6 product_main"]//p[@class="star-rating Five"])');
+      if($one === true){
+        array_push($stack,"one");
+      }
+      elseif($two === true){
+        array_push($stack,"two");
+      }
+      elseif($three === true){
+        array_push($stack,"three");
+      }
+      elseif($four === true){
+        array_push($stack,"four");
+      }
+      elseif($five === true){
+        array_push($stack,"five");
+      }
+      else {
+        array_push($stack,"zero");
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[6]//td[1]') as $row){
+              if(strpos($row->textContent, "In stock") !== false){
+                  array_push($stack, "In stock");
+                  preg_match_all('!\d+!', $row->textContent, $matches);
+                  array_push($stack, $matches[0][0]);
+              } else{
+                  array_push($stack, "Not in stock");
+                  array_push($stack, 0);
+              }
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[1]//td[1]') as $row){
+               array_push($stack,$row->textContent);
+      }
+      foreach ($xpath->query('//article[@class="product_page"]//table[@class="table table-striped"]//tr[7]//td[1]') as $row){
+               array_push($stack,$row->textContent);
+      }
+      array_push($stack, "https://books.toscrape.com/catalogue" . $endpoint);
+      array_push($all, $stack);
+      // foreach($stack as $s){
+      //   echo $s . "<br>";
+      // }
+    }
+?>
+
+<?php 
+  $file = fopen("toscrape_listing.csv","w");
+  fputcsv($file, array("ID", "Title", "Price", "Category", "Category_URL","Rating","Stock","Stock_Quantity", "UPC", "Reviews", "URL"));
+  foreach($all as $a){
+    fputcsv($file, $a);
+  }
+  function csvToJson($fname) {
+    // open csv file
+    if (!($fp = fopen($fname, 'r'))) {
+        die("Can't open file...");
+    }
+    
+    //read csv headers
+    $key = fgetcsv($fp,"1024",",");
+    
+    // parse csv rows into array
+    $json = array();
+        while ($row = fgetcsv($fp,"1024",",")) {
+        $json[] = array_combine($key, $row);
+    }
+    
+    // release file handle
+    fclose($fp);
+    
+    // encode array to json
+    return json_encode($json);
+}
+    $jsonString = csvToJson("toscrape_listing.csv");
+    $fp = fopen("toscrape_listing.json", "w");
+    fwrite($fp, $jsonString);
+    fclose($fp);
+?>
+<strong>Done, file is in the code base.</strong>
+<h1>Question 6</h1>
+    6. Write a code to create a ‘JSON’ file named ‘toscrape_listing.json’ using or reading the
+data in the file ‘toscrape_listing.csv’ from Q.5 above.
+<strong>Done, file is in the code base.</strong>
+
+<h1>Question 7</h1>
+    7. Write a code to create a ‘CSV’ file named ‘categories.csv’ with column name listed:
+a. Category
+from JSON data. (available at https://dummyjson.com/products/categories)
+<strong>Done, file is in the code base.</strong>
+    <?php 
+    $json = file_get_contents('https://dummyjson.com/products/categories');
+    $obj = json_decode($json);
+    $fp = fopen("categories.csv", "w");
+    fputcsv($fp, array("Categories"));
+    foreach($obj as $o) {
+      fputcsv($fp, array($o));
+    }
+    fclose($fp);
+?>
+<h1>Question 8</h1>
+
+8. Create a crawler to Login & Print (an array), with available unique ‘Tags’ (from Page 1).
+a. https://toscrape.com/index.html
+b. http://quotes.toscrape.com/login Login
+c. http://quotes.toscrape.com/ Collect Tags found in each listed quote from this
+page after Login.
+
+<?php 
+  $quotes = file_get_contents("http://quotes.toscrape.com/");
+  $doc = new DOMDocument();
+  $doc->loadHTML($quotes);
+  $xpath = new DOMXPath($doc);
+  $tags =  $xpath->evaluate('//div[@class="tags"]//a[@class="tag"]');
+  $tag_array = array();
+  foreach($tags as $key=>$tag){
+    array_push($tag_array, $tag->textContent);
+  }
+  $tag_array = array_unique($tag_array);
+  foreach($tag_array as $t){
+    echo $t . "<br>";
+  }
+
 ?>
     <!--
     This script places a badge on your repl's full-browser view back to your repl's cover
     page. Try various colors for the theme: dark, light, red, orange, yellow, lime, green,
     teal, blue, blurple, magenta, pink!
     -->
-    <script src="https://replit.com/public/js/replit-badge.js" theme="blue" defer></script> 
+    <script src="https://replit.com/public/js/replit-badge.js" theme="blurple" defer></script> 
   </body>
 </html>
